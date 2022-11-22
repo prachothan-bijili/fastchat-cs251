@@ -50,9 +50,9 @@ server.setblocking(0)
 
 
 server_address = (host,port)
-print ('starting up on %s port %s' % server_address)
 try:
     server.bind(server_address)
+    print ('starting up on %s port %s' % server_address)
 except :
     print("Port is busy")
     sys.exit(1)
@@ -77,10 +77,10 @@ try:
         
         # Wait for at least one of the sockets to be ready for processing     
         readable, writable, exceptional = select.select(inputs,[], inputs)
-       
+        print(1)
         # Handle inputs
         for s in readable:
-            
+            print(2)
             if s is server:               
                 # A "readable" server socket is ready to accept a connection
                 connection, client_address = s.accept()
@@ -98,10 +98,10 @@ try:
                             is_succ = "0"
                             s.send(is_succ.encode())
                         else:
-                            cursor.execute('''update USERS set status = true where name='{0}';'''.format(info["name"]))
-                            cursor.execute('''select id from USERS where name={0}'''.format(info["name"]))
+                            cursor.execute('''update USERS set status = true where name='{0}';'''.format(info["name"].upper()))
+                            cursor.execute('''select id from USERS where name='{0}';'''.format(info["name"].upper()))
                             l = cursor.fetchall()
-                            id_dict[s] = l[0]
+                            id_dict[s] = l[0][0]
                             is_succ = "1"
                             s.send(is_succ.encode())
                     if(info["info-type"] == "signup"):
@@ -132,14 +132,13 @@ try:
                         list_of_msg = json.dumps(list_of_msg)
                         s.send(list_of_msg.encode())                    
                 else:
-                    # Interpret empty result as closed connection
-                    
+                    # Interpret empty result as closed connection                    
                     # Stop listening for input on the connection
-                    cursor.execute(''' update USERS set status=true where id='{0}';'''.format(id_dict[s]))                                        
+                    cursor.execute(''' update USERS set status=false where id='{0}';'''.format(id_dict[s]))                                        
                     inputs.remove(s)
                     s.close() 
                     print('closing', client_address, 'after reading no data')
-                    del id_dict[s.getpeername()]       
+                    del id_dict[s]        
         # Handle "exceptional conditions"
         for s in exceptional:
             print ('handling exceptional condition for', s.getpeername())

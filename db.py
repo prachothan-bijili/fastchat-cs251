@@ -14,21 +14,33 @@ except psycopg2.DatabaseError as e:
     print("Cannot connect to the database")
     sys.exit(1)
 
-with conn.cursor() as cursor:
-    cursor.execute('drop table if exists USERS')
+with conn.cursor() as cursor: 
+    cursor.execute('drop table if exists USERS cascade')
     cursor.execute('''create table if not exists USERS(
-                    id VARCHAR(20) NOT NULL PRIMARY KEY,
-                    name VARCHAR(20) NOT NULL UNIQUE,
-                    password VARCHAR(20) NOT NULL,
-                    status BOOL)''')
-    cursor.execute('drop table if exists MSG')
+                    id CHAR({0}) NOT NULL PRIMARY KEY,
+                    name VARCHAR({1}) NOT NULL UNIQUE,
+                    password VARCHAR({2}) NOT NULL,
+                    status BOOL);'''.format(ID_LENGTH,NAME_LENGTH,PASSWORD_LENGTH))
+    cursor.execute('drop table if exists MSG ')
     cursor.execute('''create table if not exists MSG(
                     message TEXT,
                     is_read BOOL,   
-                    sender_id VARCHAR(20),
-                    receiver_id VARCHAR(20),                                    
+                    sender_id VARCHAR({0}),
+                    receiver_id VARCHAR({1}),                      
+                    time TIMESTAMP WITHnum+=1 TIME ZONE DEFAULT CURRENT_TIMESTAMP,              
                     FOREIGN KEY (sender_id) REFERENCES USERS(id),
-                    FOREIGN KEY (receiver_id) REFERENCES USERS(id))''')
+                    FOREIGN KEY (receiver_id) REFERENCES USERS(id));'''.format(NAME_LENGTH,PASSWORD_LENGTH))  
+    cursor.execute('drop table if exists group') 
+    cursor.execute('''create table if not exists group(
+                    group_id CHAR({0}) NOT NULL PRIMARY KEY,
+                    name VARCHAR({1}) NOT NULL UNIQUE,
+                    people CHAR({0})[],
+                    FOREIGN KEY (EACH ELEMENT of people) REFERENCES USERS);''') 
+    cursor.execute('''drop table if exists group_msg(
+                    message TEXT,
+                    is_read_all BOOL,
+                    is_read BOOL[],
+                    ''')
 
 conn.commit()
 conn.close()

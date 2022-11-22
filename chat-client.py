@@ -62,7 +62,7 @@ try:
             data = data.decode()
             data = json.loads(data)   
             num = 0 
-            p = []                         
+            p = []                      
             for pair in data["list"]:
                 if not pair[0] == usr_nam.upper():
                     num+=1
@@ -78,16 +78,16 @@ try:
             message = input("Enter a message: ")
             info = {"info-type":"message","text":message,"receiver":data["list"][n-1][1]}
             info = json.dumps(info)
-            print  ('%s: sending "%s"' % (sock.getsockname(), message))
+            #print  ('%s: sending "%s"' % (sock.getsockname(), message))
             sock.send(info.encode())            
-        elif choice == "2":
+        elif choice == "2":            
             info = {"info-type":"unread"}
             info = json.dumps(info)
             sock.send(info.encode())
             data = sock.recv(10000)
             data = data.decode()
             data = json.loads(data)
-            print(data["msgList"])  
+            print(data["msgList"])            
         else:
             continue
 
