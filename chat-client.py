@@ -14,45 +14,44 @@ try:
 except:
     print('Cannot connect to the server!') 
     sys.exit(1)   
-
-while True:
-    choice =input("Enter 1 to login OR Enter 2 to sign in: ")
-    if choice == "1":
-        user_name = input("Please enter your name: ")
-        password = input("Please enter your password: ")
-        info={"info-type":"login", "name":user_name,"password":password}       
-        try:
-            sock.sendall(json.dumps(info).encode())
-        except:
-            print('Cannot login currently! please try again later')
-            sys.exit(1)
-        is_succ = sock.recv(1024).decode()
-        if(is_succ == "1"):
-            usr_nam = user_name
-            print("login successfull!\n")
-            break
-        else:
-            print("incorrect username!")
-    elif choice == "2":
-        name = input("Please enter your name: ")
-        password = input("Please create a password: ")
-        info = {"info-type":"signup", "name":name,"password":password}
-        try:
-            sock.sendall(json.dumps(info).encode())
-        except:
-            print('Cannot sing up currently! please try again later')
-            sys.exit(1)
-        is_succ = sock.recv(1024).decode()
-        if(is_succ == "1"):
-            usr_nam = name
-            print("successfully created an account\n")
-            break
-        else:
-            print("Username already taken. please choose another username")
-    else:
-        continue
-
 try:
+    while True:
+        choice =input("Enter 1 to login OR Enter 2 to sign in: ")
+        if choice == "1":
+            user_name = input("Please enter your name: ")
+            password = input("Please enter your password: ")
+            info={"info-type":"login", "name":user_name,"password":password}       
+            try:
+                sock.sendall(json.dumps(info).encode())
+            except:
+                print('Cannot login currently! please try again later')
+                sys.exit(1)
+            is_succ = sock.recv(1024).decode()
+            if(is_succ == "1"):
+                usr_nam = user_name
+                print("login successfull!\n")
+                break
+            else:
+                print("incorrect username!")
+        elif choice == "2":
+            name = input("Please enter your name: ")
+            password = input("Please create a password: ")
+            info = {"info-type":"signup", "name":name,"password":password}
+            try:
+                sock.sendall(json.dumps(info).encode())
+            except:
+                print('Cannot sing up currently! please try again later')
+                sys.exit(1)
+            is_succ = sock.recv(1024).decode()
+            if(is_succ == "1"):
+                usr_nam = name
+                print("successfully created an account\n")
+                break
+            else:
+                print("Username already taken. please choose another username")
+        else:
+            continue
+
     while True:
         choice = input("Enter 1 to see list or 2 to see unread messages: ")
         if choice == "1":
