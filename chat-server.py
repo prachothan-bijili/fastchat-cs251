@@ -2,7 +2,7 @@ import select
 import socket
 import sys
 import queue
-import psycopg2
+import sqlite3
 import json
 import random
 
@@ -60,10 +60,10 @@ except :
 server.listen(5)
 
 try:
-    conn = psycopg2.connect("dbname=fastchatdb user=fastchat password=codebrewers")    
+    conn = sqlite3.connect("fastchat.db")    
     cursor = conn.cursor()
     print("connection successful")
-except psycopg2.DatabaseError as e:
+except sqlite3.DatabaseError as e:
     print('Error code {}: {}'.format(e.pgcode, e))    
     print("Cannot connect to the database")
     sys.exit(1)
@@ -110,20 +110,22 @@ try:
                             s.send(is_succ.encode())                            
                         else:                            
                             id = generateID()       
-                            id_dict[s] = id                                                                                                      
+                            id_dict[s] = id             
+                            print(info["public_key"])
+                            type(info["public_key"])                                                                                         
                             cursor.execute(''' INSERT INTO USERS VALUES (
-                                            '{0}','{1}','{2}',true);'''.format(id,info["name"].upper(),info["password"]))
+                                            '{0}','{1}','{2}','{3}',true);'''.format(id,info["name"].upper(),info["password"],info["public_key"]))
                             cursor.execute('''select * from USERS;''')                            
                             is_succ = "1"
                             s.send(is_succ.encode())
                     if(info["info-type"] == "online"):
-                        cursor.execute(''' select name,id from USERS where status=true;''')
+                        cursor.execute(''' select name,id,public_key from USERS where status=true;''')
                         l = cursor.fetchall()
                         data = {"list":l}
                         data = json.dumps(data)
                         s.sendall(data.encode())
                     if(info["info-type"] == "message"):
-                        cursor.execute(''' insert into MSG values 
+                        cursor.execute(''' INSERT INTO MSG VALUES 
                                         ('{0}',false,'{1}','{2}');'''.format(info["text"],id_dict[s],info["receiver"]))                          
                     if(info["info-type"] == "unread"):
                         cursor.execute('''select message,sender_id from MSG where receiver_id='{0}';'''.format(id_dict[s]))
