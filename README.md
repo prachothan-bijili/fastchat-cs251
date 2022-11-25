@@ -63,6 +63,6 @@
  
 
 ## How to run:
-* python3.10 db.py // make sure postgreSQL is installed
+* python3.10 db.py            // make sure postgreSQL is installed
 * python3.10 chat_server.py
-* python3.10 chat_client.py // any nummber of clients
+* python3.10 chat_client.py   // any number of clients
